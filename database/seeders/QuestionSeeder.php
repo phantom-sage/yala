@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-class LessonSeeder extends Seeder
+class QuestionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,6 +13,6 @@ class LessonSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Lesson::factory()->count(10)->create();
+        //
     }
 }

@@ -20,4 +20,10 @@ class Student extends Model
         'name',
         'password',
     ];
+
+    // Options
+    public function options(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Option::class);
+    }
 }

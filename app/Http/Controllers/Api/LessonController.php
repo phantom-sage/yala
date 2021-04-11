@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
 use App\Models\Picture;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class LessonController extends Controller
      */
     public function index()
     {
-        //
+        return LessonResource::collection(Lesson::all());
     }
 
     /**
@@ -61,9 +62,10 @@ class LessonController extends Controller
      */
     public function show(Lesson $lesson)
     {
-        if (! $lesson)
-            return response()->json(['message' => 'Not found'], 404);
-        return response()->json($lesson);
+        // if (! $lesson)
+        //     return response()->json(['message' => 'Not found'], 404);
+        // return response()->json($lesson);
+        return new LessonResource($lesson);
     }
 
     /**

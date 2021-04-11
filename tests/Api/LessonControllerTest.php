@@ -29,7 +29,7 @@ class LessonControllerTest extends TestCase
             'title' => $this->faker->title,
             'description' => $this->faker->text(200),
             'pictures' => [$file, $file2],
-        ])->dumpSession()->assertOk();
+        ])->assertOk();
 
         $this->assertEquals(1, Lesson::count());
         Storage::disk('public')->assertExists('pictures/' . $file->hashName());
@@ -46,8 +46,10 @@ class LessonControllerTest extends TestCase
         $id = Lesson::first()->id;
         $this->get("/api/lessons/$id")->assertOk()
         ->assertJsonStructure([
-            'title',
-            'description',
+            'data' => [
+                'title',
+                'description',
+            ]
         ]);
     }
 }

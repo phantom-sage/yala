@@ -24,6 +24,10 @@ class LessonFactory extends Factory
         return [
             'title' => $this->faker->title,
             'description' => $this->faker->sentence(12),
+            'quiz' => json_encode([
+                0 => 'first',
+                1 => 'second'
+            ]),
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
 use App\Models\Picture;
+use http\Env\Response;
 use Illuminate\Http\Request;
 
 class LessonController extends Controller
@@ -13,7 +14,7 @@ class LessonController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
@@ -24,7 +25,7 @@ class LessonController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -32,11 +33,14 @@ class LessonController extends Controller
             'title' => ['required', 'string', 'min:3', 'max:255'],
             'description' => ['required', 'string'],
             'pictures' => ['array', 'required'],
+            'quiz' => ['sometimes', 'json'],
         ]);
 
         $lesson = new Lesson();
         $lesson->title = $valid_lesson_data['title'];
         $lesson->description = $valid_lesson_data['description'];
+        if ($request->input('quiz'))
+            $lesson->quiz = $valid_lesson_data['quiz'];
         $lesson->save();
         foreach ($request->pictures as $picture)
         {
@@ -50,7 +54,7 @@ class LessonController extends Controller
         }
 
         return response()->json([
-            'message' => 'New Lesson created successfully',
+            'message' => 'New lesson created successfully',
         ]);
     }
 
@@ -58,13 +62,10 @@ class LessonController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Lesson  $lesson
-     * @return \Illuminate\Http\Response
+     * @return LessonResource
      */
     public function show(Lesson $lesson)
     {
-        // if (! $lesson)
-        //     return response()->json(['message' => 'Not found'], 404);
-        // return response()->json($lesson);
         return new LessonResource($lesson);
     }
 
@@ -84,10 +85,31 @@ class LessonController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Lesson  $lesson
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Lesson $lesson)
     {
-        //
+        $lesson->delete();
+        return response()->json([
+            'message' => 'Lesson deleted successfully',
+        ]);
+    }
+
+
+    /**
+     * Add quiz to lesson.
+     */
+    public function add_quiz_to_lesson(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $lesson = Lesson::find($id);
+        if (! $lesson)
+            return response()->json(['message' => 'Lesson not found']);
+        $valid_lesson_quiz_data = $request->validate([
+            'quiz' => ['required', 'json'],
+        ]);
+
+        $lesson->quiz = $valid_lesson_quiz_data['quiz'];
+        $lesson->save();
+        return response()->json(['message' => 'Quiz added successfully']);
     }
 }

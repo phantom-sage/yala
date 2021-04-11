@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Teacher;
+use App\Models\Quiz;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -23,7 +24,7 @@ class TeacherController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -91,5 +92,28 @@ class TeacherController extends Controller
     public function destroy(Teacher $teacher)
     {
         //
+    }
+
+
+    /**
+     * Create new quiz.
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function create_new_quiz(Request $request): \Illuminate\Http\JsonResponse
+    {
+        // TODO(01) lesson has one quiz - quiz belongs to lesson.
+        $valid_quiz_data = $request->validate([
+            'title' => ['string', 'required', 'max:255'],
+            'content' => ['string', 'required'],
+        ]);
+
+        $quiz = new Quiz();
+        $quiz->title = $valid_quiz_data['title'];
+        $quiz->content = $valid_quiz_data['content'];
+        $quiz->save();
+        return response()->json([
+            'message' => 'New quiz created successfully',
+        ]);
     }
 }

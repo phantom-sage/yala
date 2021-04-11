@@ -17,6 +17,7 @@ class CreateLessonsTable extends Migration
             $table->id();
             $table->string('title');
             $table->longText('description');
+            $table->json('quiz')->nullable();
             $table->timestamps();
         });
     }

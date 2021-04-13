@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Option;
+use App\Models\Subject;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class OptionFactory extends Factory
+class SubjectFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Option::class;
+    protected $model = Subject::class;
 
     /**
      * Define the model's default state.
@@ -22,7 +22,7 @@ class OptionFactory extends Factory
     public function definition()
     {
         return [
-            'option' => $this->faker->title,
+            'name' => $this->faker->unique()->title,
         ];
     }
 }

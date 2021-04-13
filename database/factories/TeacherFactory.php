@@ -27,7 +27,6 @@ class TeacherFactory extends Factory
             'educational_card_number' => $this->faker->bankAccountNumber,
             'educational_card_picture' => $this->faker->name,
             'class' => $this->faker->name,
-            'subject' => $this->faker->name,
             'address' => $this->faker->address,
             'phone_number' => 1234567891,
             'bank_name' => $this->faker->company,

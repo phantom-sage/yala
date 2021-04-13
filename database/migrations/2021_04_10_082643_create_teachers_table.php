@@ -20,7 +20,6 @@ class CreateTeachersTable extends Migration
             $table->string('educational_card_number');
             $table->string('educational_card_picture');
             $table->string('class');
-            $table->string('subject');
             $table->string('address');
             $table->bigInteger('phone_number', false, true);
             $table->string('bank_name');

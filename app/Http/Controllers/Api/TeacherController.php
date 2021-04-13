@@ -3,21 +3,26 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TeacherResource;
+use App\Models\Subject;
 use App\Models\Teacher;
-use App\Models\Quiz;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class TeacherController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
-        //
+        return TeacherResource::collection(Teacher::all());
     }
 
     /**
@@ -26,7 +31,7 @@ class TeacherController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $valid_teacher_data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -34,27 +39,34 @@ class TeacherController extends Controller
             'educational_card_number' => ['required', 'string', 'max:255'],
             'educational_card_picture' => ['required', 'image', 'file'],
             'class' => ['required', 'string', 'max:255'],
-            'subject' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
             'phone_number' => ['required', 'numeric'],
             'bank_name' => ['required', 'string', 'max:255'],
             'account_number' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'max:255'],
+            'subject_id' => ['numeric', 'required'],
         ]);
-        $path = $request->educational_card_picture->store('profiles', 'public');
-        Teacher::create([
-            'name' => $valid_teacher_data['name'],
-            'qualification' => $valid_teacher_data['qualification'],
-            'educational_card_number' => $valid_teacher_data['educational_card_number'],
-            'educational_card_picture' => $path,
-            'class' => $valid_teacher_data['class'],
-            'subject' => $valid_teacher_data['subject'],
-            'address' => $valid_teacher_data['address'],
-            'phone_number' => $valid_teacher_data['phone_number'],
-            'bank_name' => $valid_teacher_data['bank_name'],
-            'account_number' => $valid_teacher_data['account_number'],
-            'password' => Hash::make($valid_teacher_data['password']),
-        ]);
+        $subject = Subject::find($valid_teacher_data['subject_id']);
+        if (! $subject)
+            return response()->json(['message' => 'Subject not found']);
+
+        $path = $request->file('educational_card_picture')->store('profiles', 'public');
+        $teacher = new Teacher();
+        $teacher->name = $valid_teacher_data['name'];
+        $teacher->qualification = $valid_teacher_data['qualification'];
+        $teacher->educational_card_number = $valid_teacher_data['educational_card_number'];
+        $teacher->educational_card_picture = $path;
+        $teacher->class = $valid_teacher_data['class'];
+        $teacher->address = $valid_teacher_data['address'];
+        $teacher->phone_number = $valid_teacher_data['phone_number'];
+        $teacher->bank_name = $valid_teacher_data['bank_name'];
+        $teacher->account_number = $valid_teacher_data['account_number'];
+        $teacher->password = Hash::make($valid_teacher_data['password']);
+        $teacher->save();
+
+        $subject->teacher_id = $teacher->id;
+        $subject->save();
+
         return response()->json([
             'message' => 'New teacher created successfully',
         ]);
@@ -64,11 +76,11 @@ class TeacherController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Teacher  $teacher
-     * @return \Illuminate\Http\Response
+     * @return TeacherResource
      */
-    public function show(Teacher $teacher)
+    public function show(Teacher $teacher): TeacherResource
     {
-        //
+        return new TeacherResource($teacher);
     }
 
     /**
@@ -76,44 +88,63 @@ class TeacherController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Teacher  $teacher
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function update(Request $request, Teacher $teacher)
+    public function update(Request $request, Teacher $teacher): JsonResponse
     {
-        //
+        $valid_teacher_data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'qualification' => ['required', 'string', 'max:255'],
+            'educational_card_number' => ['required', 'string', 'max:255'],
+            'educational_card_picture' => ['required', 'image', 'file'],
+            'class' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string', 'max:255'],
+            'phone_number' => ['required', 'numeric'],
+            'bank_name' => ['required', 'string', 'max:255'],
+            'account_number' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'string', 'max:255'],
+            'subject_id' => ['numeric', 'required'],
+        ]);
+        $subject = Subject::find($valid_teacher_data['subject_id']);
+        if (! $subject)
+            return response()->json(['message' => 'Subject not found']);
+        Storage::disk('public')->delete($teacher->educational_card_picture);
+        $path = $request->file('educational_card_picture')->store('profiles', 'public');
+        $teacher->name = $valid_teacher_data['name'];
+        $teacher->qualification = $valid_teacher_data['qualification'];
+        $teacher->educational_card_number = $valid_teacher_data['educational_card_number'];
+        $teacher->educational_card_picture = $path;
+        $teacher->class = $valid_teacher_data['class'];
+        $teacher->address = $valid_teacher_data['address'];
+        $teacher->phone_number = $valid_teacher_data['phone_number'];
+        $teacher->bank_name = $valid_teacher_data['bank_name'];
+        $teacher->account_number = $valid_teacher_data['account_number'];
+        $teacher->password = Hash::make($valid_teacher_data['password']);
+        $teacher->save();
+
+        $subject->teacher_id = $teacher->id;
+        $subject->save();
+
+        return response()->json([
+            'message' => 'Teacher updated successfully',
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Teacher  $teacher
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Teacher $teacher)
-    {
-        //
-    }
-
-
-    /**
-     * Create new quiz.
-     * @param Request $request
+     * @param \App\Models\Teacher $teacher
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
-    public function create_new_quiz(Request $request): \Illuminate\Http\JsonResponse
+    public function destroy(Teacher $teacher): JsonResponse
     {
-        // TODO(01) lesson has one quiz - quiz belongs to lesson.
-        $valid_quiz_data = $request->validate([
-            'title' => ['string', 'required', 'max:255'],
-            'content' => ['string', 'required'],
-        ]);
-
-        $quiz = new Quiz();
-        $quiz->title = $valid_quiz_data['title'];
-        $quiz->content = $valid_quiz_data['content'];
-        $quiz->save();
-        return response()->json([
-            'message' => 'New quiz created successfully',
-        ]);
+        Storage::disk('public')->delete($teacher->educational_card_picture);
+        $teacher->delete();
+        return response()
+            ->json([
+                'message' => 'Teacher deleted successfully',
+            ]);
     }
+
 }

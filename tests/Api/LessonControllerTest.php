@@ -3,6 +3,7 @@
 namespace Tests\Api;
 
 use App\Models\Lesson;
+use App\Models\Subject;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -49,13 +50,51 @@ class LessonControllerTest extends TestCase
         $file_2 = UploadedFile::fake()->image('lesson2.jpg');
         $file_3 = UploadedFile::fake()->image('lesson3.jpg');
 
+        Subject::factory()->count(1)->create();
+
         $this->postJson('/api/lessons', [
             'title' => $this->faker->title,
             'description' => $this->faker->text,
             'pictures' => [$file_1, $file_2, $file_3],
+            'subject_id' => Subject::first()->id,
         ])->assertOk();
 
         $this->assertDatabaseCount('lessons', 1);
+        $this->assertDatabaseCount('subjects', 1);
+        $this->assertEquals(Subject::first()->id, Lesson::first()->id);
+        Storage::disk('public')->assertExists('pictures/' . $file_1->hashName());
+        Storage::disk('public')->assertExists('pictures/' . $file_2->hashName());
+        Storage::disk('public')->assertExists('pictures/' . $file_3->hashName());
+    }
+
+
+    /**
+     * Test case for update.
+     * @test
+     */
+    public function update()
+    {
+        $this->store();
+
+        $this->withExceptionHandling();
+        Storage::fake('pictures');
+        $file_1 = UploadedFile::fake()->image('lesson1.jpg');
+        $file_2 = UploadedFile::fake()->image('lesson2.jpg');
+        $file_3 = UploadedFile::fake()->image('lesson3.jpg');
+
+
+        $id = Lesson::first()->id;
+        $this->putJson("/api/lessons/$id", [
+            'title' => $this->faker->title,
+            'description' => $this->faker->text,
+            'pictures' => [$file_1, $file_2, $file_3],
+            'subject_id' => Subject::first()->id,
+        ])->assertOk();
+
+        $this->assertDatabaseCount('lessons', 1);
+        $this->assertDatabaseCount('subjects', 1);
+        $this->assertDatabaseCount('pictures', 3);
+        $this->assertEquals(Subject::first()->id, Lesson::first()->id);
         Storage::disk('public')->assertExists('pictures/' . $file_1->hashName());
         Storage::disk('public')->assertExists('pictures/' . $file_2->hashName());
         Storage::disk('public')->assertExists('pictures/' . $file_3->hashName());
@@ -68,9 +107,11 @@ class LessonControllerTest extends TestCase
      */
     public function destroy()
     {
-        Lesson::factory()->count(1)->create();
+        $this->store();
         $id = Lesson::first()->id;
         $this->deleteJson("/api/lessons/$id")->assertOk();
+        $this->assertDatabaseCount('lessons', 0);
+        $this->assertDatabaseCount('pictures', 0);
     }
 
 

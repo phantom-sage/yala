@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-class QuizSeeder extends Seeder
+class SubjectSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,6 +13,6 @@ class QuizSeeder extends Seeder
      */
     public function run()
     {
-        //
+        \App\Models\Subject::factory()->count(10)->create();
     }
 }

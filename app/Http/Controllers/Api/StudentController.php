@@ -33,7 +33,7 @@ class StudentController extends Controller
     {
         $valid_student_data = $request->validate([
             'parent_name' => ['string', 'required', 'min:3', 'max:255'],
-            'phone_number' => ['required', 'numeric'],
+            'phone_number' => ['required', 'phone:SD'],
             'address' => ['string', 'required'],
             'bank_name' => ['string', 'required'],
             'account_number' => ['string', 'required'],
@@ -80,7 +80,7 @@ class StudentController extends Controller
     {
         $valid_student_data = $request->validate([
             'parent_name' => ['string', 'required', 'min:3', 'max:255'],
-            'phone_number' => ['required', 'numeric'],
+            'phone_number' => ['required', 'phone:SD'],
             'address' => ['string', 'required'],
             'bank_name' => ['string', 'required'],
             'account_number' => ['string', 'required'],

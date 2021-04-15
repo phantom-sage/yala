@@ -40,7 +40,7 @@ class TeacherController extends Controller
             'educational_card_picture' => ['required', 'image', 'file'],
             'class' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
-            'phone_number' => ['required', 'numeric'],
+            'phone_number' => ['required', 'phone:SD'],
             'bank_name' => ['required', 'string', 'max:255'],
             'account_number' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class TeacherController extends Controller
             'educational_card_picture' => ['required', 'image', 'file'],
             'class' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
-            'phone_number' => ['required', 'numeric'],
+            'phone_number' => ['required', 'phone:SD'],
             'bank_name' => ['required', 'string', 'max:255'],
             'account_number' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'max:255'],
@@ -144,6 +144,44 @@ class TeacherController extends Controller
         return response()
             ->json([
                 'message' => 'Teacher deleted successfully',
+            ]);
+    }
+
+
+    /**
+     * Login teacher to his account.
+     * @param Request $request
+     */
+    public function login(Request $request)
+    {
+        $valid_teacher_data = $request->validate([
+            'name' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
+
+
+        $teacher = Teacher::where([
+            ['name', '=', $valid_teacher_data['name']],
+        ])->first();
+
+        # if teacher not found.
+        if (! $teacher)
+            return response()
+                ->json([
+                    'message' => 'Not found',
+                ]);
+
+        # check for password
+        $hashed_password = Hash::make($valid_teacher_data['password']);
+        if (! Hash::check($valid_teacher_data['password'], $teacher->password))
+            return response()
+                ->json([
+                    'message' => 'Not found',
+                ]);
+
+        return response()
+            ->json([
+                'teacher' => new TeacherResource($teacher),
             ]);
     }
 

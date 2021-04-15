@@ -23,7 +23,7 @@ class StudentFactory extends Factory
     {
         return [
             'parent_name' => $this->faker->name,
-            'phone_number' => 1234567891,
+            'phone_number' => '0121506261',
             'address' => $this->faker->name,
             'bank_name' => $this->faker->name,
             'account_number' => $this->faker->bankAccountNumber,

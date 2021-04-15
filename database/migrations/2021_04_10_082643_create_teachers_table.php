@@ -21,7 +21,7 @@ class CreateTeachersTable extends Migration
             $table->string('educational_card_picture');
             $table->string('class');
             $table->string('address');
-            $table->bigInteger('phone_number', false, true);
+            $table->string('phone_number');
             $table->string('bank_name');
             $table->string('account_number');
             $table->string('password');

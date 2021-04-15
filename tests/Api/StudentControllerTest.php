@@ -43,9 +43,11 @@ class StudentControllerTest extends TestCase
      */
     public function store()
     {
+        $this->withoutExceptionHandling();
+
         $this->postJson('/api/students', [
             'parent_name' => $this->faker->name,
-            'phone_number' => 1912345678,
+            'phone_number' => '0121506261',
             'address' => $this->faker->address,
             'bank_name' => $this->faker->company,
             'account_number' => $this->faker->bankAccountNumber,
@@ -71,7 +73,7 @@ class StudentControllerTest extends TestCase
         $id = Student::first()->id;
         $this->putJson("/api/students/$id", [
             'parent_name' => 'new parent name',
-            'phone_number' => 1912345678,
+            'phone_number' => '0121506261',
             'address' => $this->faker->address,
             'bank_name' => $this->faker->company,
             'account_number' => $this->faker->bankAccountNumber,

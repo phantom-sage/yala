@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Propaganistas\LaravelPhone\Casts\RawPhoneNumberCast;
 
 /**
  * @method static create(array $array)
  * @method static first()
  * @method static find($id)
- * @method static where(string $string, $id)
  * @method static count()
  * @property mixed name
  * @property mixed qualification
@@ -42,6 +42,13 @@ class Teacher extends Model
         'bank_name',
         'account_number',
         'password',
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $casts = [
+        'phone_number' => RawPhoneNumberCast::class.':SD',
     ];
 
     public function subjects(): HasMany

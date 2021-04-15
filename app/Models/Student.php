@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Propaganistas\LaravelPhone\Casts\RawPhoneNumberCast;
 
 /**
  * @method static create(array $array)
@@ -38,6 +39,14 @@ class Student extends Model
         'class',
         'name',
         'password',
+    ];
+
+
+    /**
+     * @var string[]
+     */
+    protected $casts = [
+        'phone_number' => RawPhoneNumberCast::class.':SD',
     ];
 
 }

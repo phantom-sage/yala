@@ -57,13 +57,13 @@ class TeacherControllerTest extends TestCase
         $file = UploadedFile::fake()->image('profile.jpg');
 
         $this->postJson('/api/teachers', [
-            'name' => $this->faker->name,
+            'name' => 'teacher_name',
             'qualification' => $this->faker->name,
             'educational_card_number' => $this->faker->bankAccountNumber,
             'educational_card_picture' => $file,
             'class' => $this->faker->name,
             'address' => $this->faker->address,
-            'phone_number' => 1234567891,
+            'phone_number' => '0121506261',
             'bank_name' => $this->faker->company,
             'account_number' => $this->faker->bankAccountNumber,
             'password' => 'password',
@@ -99,7 +99,7 @@ class TeacherControllerTest extends TestCase
             'educational_card_picture' => $file,
             'class' => $this->faker->name,
             'address' => $this->faker->address,
-            'phone_number' => 1234567891,
+            'phone_number' => '0121506261',
             'bank_name' => $this->faker->company,
             'account_number' => $this->faker->bankAccountNumber,
             'password' => 'password',
@@ -126,5 +126,29 @@ class TeacherControllerTest extends TestCase
         $this->deleteJson("/api/teachers/$id")
             ->assertOk();
         $this->assertDatabaseCount('teachers', 0);
+    }
+
+
+    /**
+     * Test case for login.
+     * @test
+     */
+    public function login()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->store();
+
+        $this->assertDatabaseCount('teachers', 1);
+
+        $name = 'teacher_name';
+        $password = 'password';
+
+        $this->postJson('/api/teachers/login', [
+            'name' => $name,
+            'password' => $password,
+        ])->assertOk();
+
+        $this->assertDatabaseCount('teachers', 1);
     }
 }

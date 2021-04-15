@@ -26,5 +26,6 @@ Route::resource('students', StudentController::class);
 Route::resource('teachers', TeacherController::class);
 Route::resource('subjects', SubjectController::class);
 Route::post('teachers/create-new-quiz', [TeacherController::class, 'create_new_quiz']);
+Route::post('teachers/login', [TeacherController::class, 'login']);
 Route::resource('lessons', LessonController::class);
 Route::put('lessons/add-quiz-to-lesson/{id}', [LessonController::class, 'add_quiz_to_lesson']);
